@@ -97,9 +97,7 @@ pub fn disassemble(inst: Umi) -> String {
                 get(&RC, inst)
             )
         }
-        Some(Opcode::Halt) => {
-            format!("halt")
-        }
+        Some(Opcode::Halt) => "halt".to_string(),
         Some(Opcode::MapSegment) => {
             format!(
                 "r{} := map segment (r{} words);",
