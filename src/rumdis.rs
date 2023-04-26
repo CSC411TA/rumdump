@@ -1,3 +1,6 @@
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
+
 /// A Umi is just a synonym for a Universal Machine instruction
 type Umi = u32;
 
@@ -36,8 +39,8 @@ pub fn op(instruction: Umi) -> u32 {
 
 /// Given `inst` (a `Umi`) pretty-print a human-readable version
 pub fn disassemble(inst: Umi) -> String {
-    match get(&OP, inst) {
-        o if o == Opcode::CMov as u32 => {
+    match FromPrimitive::from_u32(get(&OP, inst)) {
+        Some(Opcode::CMov) => {
             format!(
                 "if (r{} != 0) r{} := r{};",
                 get(&RC, inst),
@@ -45,7 +48,7 @@ pub fn disassemble(inst: Umi) -> String {
                 get(&RB, inst)
             )
         }
-        o if o == Opcode::Load as u32 => {
+        Some(Opcode::Load) => {
             format!(
                 "r{} := m[r{}][r{}];",
                 get(&RA, inst),
@@ -53,7 +56,7 @@ pub fn disassemble(inst: Umi) -> String {
                 get(&RC, inst)
             )
         }
-        o if o == Opcode::Store as u32 => {
+        Some(Opcode::Store) => {
             format!(
                 "m[r{}][r{}] := r{};",
                 get(&RA, inst),
@@ -61,7 +64,7 @@ pub fn disassemble(inst: Umi) -> String {
                 get(&RC, inst)
             )
         }
-        o if o == Opcode::Add as u32 => {
+        Some(Opcode::Add) => {
             format!(
                 "r{} := r{} + r{};",
                 get(&RA, inst),
@@ -69,7 +72,7 @@ pub fn disassemble(inst: Umi) -> String {
                 get(&RC, inst)
             )
         }
-        o if o == Opcode::Mul as u32 => {
+        Some(Opcode::Mul) => {
             format!(
                 "r{} := r{} * r{};",
                 get(&RA, inst),
@@ -77,7 +80,7 @@ pub fn disassemble(inst: Umi) -> String {
                 get(&RC, inst)
             )
         }
-        o if o == Opcode::Div as u32 => {
+        Some(Opcode::Div) => {
             format!(
                 "r{} := r{} / r{};",
                 get(&RA, inst),
@@ -86,7 +89,7 @@ pub fn disassemble(inst: Umi) -> String {
             )
         }
         // possible enhancement: if RB == RC, complement RC
-        o if o == Opcode::Nand as u32 => {
+        Some(Opcode::Nand) => {
             format!(
                 "r{} := r{} nand r{};",
                 get(&RA, inst),
@@ -94,43 +97,44 @@ pub fn disassemble(inst: Umi) -> String {
                 get(&RC, inst)
             )
         }
-        o if o == Opcode::Halt as u32 => {
+        Some(Opcode::Halt) => {
             format!("halt")
         }
-        o if o == Opcode::MapSegment as u32 => {
+        Some(Opcode::MapSegment) => {
             format!(
                 "r{} := map segment (r{} words);",
                 get(&RB, inst),
                 get(&RC, inst)
             )
         }
-        o if o == Opcode::UnmapSegment as u32 => {
+        Some(Opcode::UnmapSegment) => {
             format!("unmap r{};", get(&RC, inst))
         }
-        o if o == Opcode::Output as u32 => {
+        Some(Opcode::Output) => {
             format!("output r{};", get(&RC, inst))
         }
-        o if o == Opcode::Input as u32 => {
+        Some(Opcode::Input) => {
             format!("r{} := input();", get(&RC, inst))
         }
-        o if o == Opcode::LoadProgram as u32 => {
+        Some(Opcode::LoadProgram) => {
             format!(
                 "goto r{} in program m[r{}];",
                 get(&RC, inst),
                 get(&RB, inst)
             )
         }
-        o if o == Opcode::LoadValue as u32 => {
+        Some(Opcode::LoadValue) => {
             format!("r{} := {};", get(&RL, inst), get(&VL, inst))
         }
 
         _ => {
-            format!(".data 0x{:x}", inst)
+            format!(".data 0x{:08x}", inst)
         }
     }
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone, FromPrimitive)]
+#[repr(u32)]
 enum Opcode {
     CMov,
     Load,
