@@ -2,6 +2,9 @@
 name = "rumdump"
 version = "0.1.0"
 edition = "2021"
+description = "A simple object file dumper for the UM (ICFP 2006) 14-instruction architecture"
+license = "MIT"
+repository = "https://github.com/CSC411TA/rumdump"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
