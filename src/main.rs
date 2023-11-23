@@ -8,6 +8,12 @@ fn main() {
     let instructions = rumload::load(input.as_deref());
     println!("{} instructions", instructions.len());
     for (i, instruction) in instructions.iter().enumerate() {
-        println!("{}: [{:08x}] {}", i, instruction, rumdis::disassemble(*instruction));
+        println!(
+            "{:06}: [{:08x}] [{}] {}",
+            i,
+            instruction,
+            rumdis::bin_string(*instruction),
+            rumdis::disassemble(*instruction)
+        );
     }
 }

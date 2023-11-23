@@ -1,3 +1,5 @@
+use ansi_term;
+use ansi_term::Colour::{Blue, Fixed, Green, Purple, Red};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -33,13 +35,70 @@ pub fn get(field: &Field, instruction: Umi) -> u32 {
 }
 
 /// Given an instruction word, extract the opcode
-pub fn op(instruction: Umi) -> u32 {
-    (instruction >> OP.lsb) & mask(OP.width)
+fn op(instruction: Umi) -> Option<Opcode> {
+    FromPrimitive::from_u32((instruction >> OP.lsb) & mask(OP.width))
+}
+
+pub fn bin_string(inst: Umi) -> String {
+    let bin = format!("{:032b}", inst);
+    let junk_color = Fixed(240);
+    let op_color = Fixed(208);
+    let a_color = Red;
+    let b_color = Green;
+    let c_color = Blue;
+    let v_color = Purple;
+    match op(inst) {
+        Some(Opcode::CMov) | Some(Opcode::Load) | Some(Opcode::Store) | Some(Opcode::Add)
+        | Some(Opcode::Mul) | Some(Opcode::Div) | Some(Opcode::Nand) => {
+            format!(
+                "{}{}{}{}{}",
+                op_color.paint(&bin[0..4]),
+                junk_color.paint(&bin[4..23]),
+                a_color.paint(&bin[23..26]),
+                b_color.paint(&bin[26..29]),
+                c_color.paint(&bin[29..])
+            )
+        }
+        Some(Opcode::Halt) => format!(
+            "{}{}",
+            op_color.paint(&bin[0..4]),
+            junk_color.paint(&bin[4..])
+        ),
+        Some(Opcode::MapSegment) | Some(Opcode::LoadProgram) => {
+            format!(
+                "{}{}{}{}",
+                op_color.paint(&bin[0..4]),
+                junk_color.paint(&bin[4..26]),
+                b_color.paint(&bin[26..29]),
+                c_color.paint(&bin[29..])
+            )
+        }
+        Some(Opcode::UnmapSegment) | Some(Opcode::Output) | Some(Opcode::Input) => {
+            format!(
+                "{}{}{}",
+                op_color.paint(&bin[0..4]),
+                junk_color.paint(&bin[4..29]),
+                c_color.paint(&bin[29..])
+            )
+        }
+
+        Some(Opcode::LoadValue) => {
+            format!(
+                "{}{}{}",
+                op_color.paint(&bin[0..4]),
+                b_color.paint(&bin[4..7]),
+                v_color.paint(&bin[7..])
+            )
+        }
+
+        _ => bin.to_string(),
+    }
 }
 
 /// Given `inst` (a `Umi`) pretty-print a human-readable version
 pub fn disassemble(inst: Umi) -> String {
-    match FromPrimitive::from_u32(get(&OP, inst)) {
+    // match FromPrimitive::from_u32(get(&OP, inst)) {
+    match op(inst) {
         Some(Opcode::CMov) => {
             format!(
                 "if (r{} != 0) r{} := r{};",
