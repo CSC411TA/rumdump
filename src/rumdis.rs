@@ -39,13 +39,33 @@ fn op(instruction: Umi) -> Option<Opcode> {
     FromPrimitive::from_u32((instruction >> OP.lsb) & mask(OP.width))
 }
 
+pub fn header() -> String {
+    let junk_color = Fixed(240);
+    let op_color = Fixed(208);
+    let a_color = Blue;
+    let b_color = Green;
+    let c_color = Red;
+    let v_color = Purple;
+    format!(
+        "Legend:\ninstr#: [hex_u32_] [{}{}{}{}{}]\n(load value op 13) [{}{}{}]\n",
+        op_color.paint("#OP#"),
+        junk_color.paint("unused_bits_OP_0-12"),
+        a_color.paint("R_A"),
+        b_color.paint("R_B"),
+        c_color.paint("R_C"),
+        op_color.paint("OP13"),
+        a_color.paint("R_A"),
+        v_color.paint("LOAD_LITERAL_25_BIT_VALUE"),
+    )
+}
+
 pub fn bin_string(inst: Umi) -> String {
     let bin = format!("{:032b}", inst);
     let junk_color = Fixed(240);
     let op_color = Fixed(208);
-    let a_color = Red;
+    let a_color = Blue;
     let b_color = Green;
-    let c_color = Blue;
+    let c_color = Red;
     let v_color = Purple;
     match op(inst) {
         Some(Opcode::CMov) | Some(Opcode::Load) | Some(Opcode::Store) | Some(Opcode::Add)
@@ -86,7 +106,7 @@ pub fn bin_string(inst: Umi) -> String {
             format!(
                 "{}{}{}",
                 op_color.paint(&bin[0..4]),
-                b_color.paint(&bin[4..7]),
+                a_color.paint(&bin[4..7]),
                 v_color.paint(&bin[7..])
             )
         }
