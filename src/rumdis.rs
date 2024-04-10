@@ -1,4 +1,3 @@
-use ansi_term;
 use ansi_term::Colour::{Blue, Fixed, Green, Purple, Red};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;

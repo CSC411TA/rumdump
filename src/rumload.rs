@@ -1,4 +1,3 @@
-use std::convert::TryInto;
 /// Given an `input` (either a file path or STDIN),
 /// read a sequence of big-endian 32-bit instruction words
 pub fn load(input: Option<&str>) -> Vec<u32> {
