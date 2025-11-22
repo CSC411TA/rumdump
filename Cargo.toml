@@ -10,5 +10,5 @@ repository = "https://github.com/CSC411TA/rumdump"
 
 [dependencies]
 num-traits = "0.2"
-num-derive = "0.2"
+num-derive = "0.4"
 ansi_term = "0.12.1"
